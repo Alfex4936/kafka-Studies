@@ -3,10 +3,16 @@
     <img width="480" src="https://www.andplus.com/hs-fs/hubfs/kafkalogo.jpg?&name=kafkalogo.jpg">
 </p>
 <h1>Apache Kafka 공부</h1>
+    <h5>v2.13-2.6.0</h5>
 
 [Apache Kafka](https://kafka.apache.org/)
 
 </div>
+
+## 설치
+[Kafka 다운로드](https://kafka.apache.org/downloads)
+
+*Download Binary*
 
 ## 실행
 
