@@ -8,6 +8,18 @@
 
 </div>
 
+## 실행
+
+zookeeper & kafka 서버 실행
+
+```console
+
+WIN10@DESKTOP:~$ zookeeper-server-start config/zookeeper.properties
+
+WIN10@DESKTOP:~$ kafka-server-start config/server.properties
+
+```
+
 ## 목차
 
 <table>
