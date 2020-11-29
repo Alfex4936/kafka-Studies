@@ -9,10 +9,23 @@
 
 </div>
 
+## 목차
+
+<table>
+    <tr><td width=40% valign=top>
+        
+* Kafka
+    * [Simple Producer](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemo.java)
+    * [Producer with callback](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemoCallBack.java)
+    * [Producer with key](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemoWithKey.java)
+    * [Simple Consumer](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson2/ConsumerDemo.java)
+</td></tr>
+</table>
+
 ## 설치
 [Kafka 다운로드](https://kafka.apache.org/downloads)
 
-*Download Binary*
+*Make sure to Download "Binary"*
 
 ## 실행
 
@@ -78,13 +91,3 @@ group-one                      first-topic                    1          0
 group-one                      first-topic                    2          0
 
 ```
-
-## 목차
-
-<table>
-    <tr><td width=40% valign=top>
-        
-* Kafka
-    * [Simple Producer](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemo.java)
-</td></tr>
-</table>
