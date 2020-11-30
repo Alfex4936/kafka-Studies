@@ -2,7 +2,7 @@
 <p>
     <img width="480" src="https://www.andplus.com/hs-fs/hubfs/kafkalogo.jpg?&name=kafkalogo.jpg">
 </p>
-<h1>Apache Kafka 공부</h1>
+<h1>Apache Kafka 공부 (Java, Python)</h1>
     <h5>v2.13-2.6.0</h5>
 
 [Apache Kafka](https://kafka.apache.org/)
@@ -14,7 +14,7 @@
 <table>
     <tr><td width=40% valign=top>
         
-* Kafka
+* Kafka (Java)
     * [Simple Producer](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemo.java)
     * [Producer with callback](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemoCallBack.java)
     * [Producer with key](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemoWithKey.java)

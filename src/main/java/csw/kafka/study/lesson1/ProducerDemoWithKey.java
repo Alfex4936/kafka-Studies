@@ -31,7 +31,7 @@ public class ProducerDemoWithKey {
             logger.info("Key: " + key);
 
             // Kafka Producer Record
-            ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, key, value);
+            ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
 
             // Consumer한테 데이터 보내기 - 비동기
             producer.send(record, new Callback() {
