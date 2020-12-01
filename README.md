@@ -4,6 +4,8 @@
 </p>
 <h1>Apache Kafka 공부 (Java, Python)</h1>
     <h5>v2.13-2.6.0</h5>
+    
+<a href="https://hits.seeyoufarm.com"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FAlfex4936%2Fkafka-Studies&count_bg=%233DA1C8&title_bg=%23555555&icon=apachekafka.svg&icon_color=%23E7E7E7&title=%2B&edge_flat=false"/></a>
 
 [Apache Kafka](https://kafka.apache.org/)
 
