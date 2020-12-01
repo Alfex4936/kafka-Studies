@@ -17,6 +17,7 @@
 * Kafka (Python)
     * [Simple Producer](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/ProducerDemo.py)
     * [Producer with callback](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/ProducerDemoCallBack.py)
+    * [Consumer with Slack API](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/SlackKafkaConsumer.py)
     
 * Kafka (Java)
     * [Simple Producer](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemo.java)
