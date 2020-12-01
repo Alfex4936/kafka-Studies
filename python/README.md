@@ -34,3 +34,44 @@ WIN10@DESKTOP:~$ pip install confluent-kafka
 
 ```
 
+## Slack Consumer Usage
+
+Modified version of [official Confluent example](https://github.com/confluentinc/infoq-kafka-ksql)
+
+[Get Slack API](https://api.slack.com/)
+
+Add "chat:write" scope to both user and bot.
+
+Copy Bot User OAuth Access Token from OAuth & Permissions section.
+
+```console
+/INVITE @BOTNAME
+```
+
+to your channel if you see an error, "** FAILED: not_in_channel"
+
+Using CLI or producers, send a data to your kafka topic.
+
+```console
+kafka-console-producer --broker-list localhost:9092 --topic SLACK-KAFKA
+> {"CLUB_STATUS":"platinum","EMAIL":"ikr@kakao.com","STARS":1,"MESSAGE":"Exceeded all my expectations!"}
+```
+
+Whenever you send a data to kafka,
+this consumer consumes email and message from the user,
+and posts "EMAIL just left a bad review" to your slack channel.
+
+```console
+Result
+
+Sending message "`ikr@kakao.com` just left a bad review :disappointed:
+> Exceeded all my expectations!
+
+_Please contact them immediately and see if we can fix the issue *right here, right now*_" to channel kafka
+```
+
+<div align="center">
+<p>
+    <img width="480" src="https://github.com/Alfex4936/kafka-Studies/blob/main/img/slack.png">
+</p>
+</div>
