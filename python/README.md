@@ -34,7 +34,25 @@ WIN10@DESKTOP:~$ pip install confluent-kafka
 
 ```
 
-## Slack Consumer Usage
+## Slack API Producer Usage
+
+[Get Slack API](https://api.slack.com/)
+
+Invite your bot to user community channel and your developer channel.
+
+This producer sends a data if users post comments containing a word, "bug".
+
+```json
+example data)
+{ "USER": "ikr", "TEXT": "I found a bug! I can keep copying my items to my inventory." }
+```
+
+Then the consumer below, will consume the data and posts a message in your developer channel.
+
+"USERNAME: MESSAGE: Please see if we can fix it right here, right now"
+
+
+## Slack API Consumer Usage
 
 Modified version of [official Confluent example](https://github.com/confluentinc/infoq-kafka-ksql)
 
