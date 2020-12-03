@@ -1,6 +1,7 @@
 class Config:
     MY_SERVER = "localhost:9092"
     TOPIC_ID = "first-topic"
+    SLACK_TOPID_ID = "SLACK-KAFKA"
     GROUP_ID = "group-one"
 
     CLIENT_ID = "client-1"

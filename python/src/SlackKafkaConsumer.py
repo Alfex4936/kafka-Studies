@@ -1,10 +1,10 @@
-# @rmoff / 20 Jul 2018
+import json
+import time
+
+from confluent_kafka import Consumer, KafkaError
 from slack import WebClient
 from slack.errors import SlackApiError
 
-from confluent_kafka import Consumer, KafkaError
-import json
-import time
 
 # Bot User OAuth Access Token
 # Scope = chat:write
@@ -16,7 +16,7 @@ sc = WebClient(token)
 # from the beginning of the topic
 settings = {
     "bootstrap.servers": "localhost:9092",
-    "group.id": "python_kafka_notify.py",
+    "group.id": "kafka-notify",
     "default.topic.config": {"auto.offset.reset": "largest"},
 }
 c = Consumer(settings)
@@ -41,12 +41,12 @@ try:
                 app_msg = json.loads(msg.value())
 
             try:
-                email = app_msg["EMAIL"]
-                message = app_msg["MESSAGE"]
+                user = app_msg["USER"]
+                message = app_msg["TEXT"]
                 channel = "kafka"
                 text = (
-                    "`%s` just left a bad review :disappointed:\n> %s\n\n_Please contact them immediately and see if we can fix the issue *right here, right now*_"
-                    % (email, message)
+                    "`%s` found a bug :\n> %s\n\n_Please see if we can fix the issue *right here, right now*_"
+                    % (user, message)
                 )
                 print('\nSending message "%s" to channel %s' % (text, channel))
             except SlackApiError as e:
@@ -56,12 +56,7 @@ try:
                 text = msg.value()
 
             try:
-                sc_response = sc.chat_postMessage(
-                    channel=channel,
-                    text=text,
-                    username="KSQL Notifications",
-                    icon_emoji=":rocket:",
-                )
+                sc_response = sc.chat_postMessage(channel=channel, text=text,)
             except SlackApiError as e:
                 assert e.response["ok"] is False
                 print("\t** FAILED: %s" % e.response["error"])
