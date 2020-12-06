@@ -34,6 +34,36 @@ WIN10@DESKTOP:~$ pip install confluent-kafka
 
 ```
 
+## Slack API with Ajou University notices parser
+
+[Get Slack API here](https://api.slack.com/)
+
+First, invite your bot to your channel. (In this example, we set it as "#아주대")
+
+The [producer](https://github.com/Alfex4936/kafka-Studies/tree/main/python/src/AjouSlackProducer.py) will notify the [consumer](https://github.com/Alfex4936/kafka-Studies/tree/main/python/src/AjouSlackConsumer.py) whenever there are new notices.
+
+The *producer* checks new notices per an hour, saves latest 10 notices to json file,
+and sees if there is/are a new notice/s.
+
+If there is a new notice, it sends {"TITLE": "title", "DATE": "post date", "LINK": "http address", "WRITER": "writer"} to the consumer.
+
+The *consumer* checks new datas every 5 seconds, if it gets a new data,
+it consumes the data and leave a comment like this below image.
+
+<div align="center">
+<p>
+    <img width="480" src="https://github.com/Alfex4936/kafka-Studies/blob/main/img/slack_ajou.png">
+</p>
+</div>
+
+:b: Run the server first to see the results.
+
+```console
+WIN10@DESKTOP:~$ python AjouSlackProducer.py
+
+WIN10@DESKTOP:~$ python AjouSlackConsumer.py
+```
+
 ## Slack API Producer Usage
 
 [Get Slack API](https://api.slack.com/)

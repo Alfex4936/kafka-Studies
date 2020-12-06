@@ -1,6 +1,8 @@
 import json
 import time
 
+import os
+
 from config import Config
 from confluent_kafka import Producer
 from slack import WebClient
@@ -9,7 +11,7 @@ from slack.errors import SlackApiError
 
 # Bot User OAuth Access Token
 # used scopes: channels:history, channels:read, chat:write, im:history, mpim:history, users:read
-token = ""
+token = os.environ["SLACK_BOT_TOKEN"]
 
 # Slack API 초기화
 sc = WebClient(token)
