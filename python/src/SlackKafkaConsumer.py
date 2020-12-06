@@ -27,6 +27,7 @@ c = Consumer(settings)
 # Topic = "SLACK-KAFKA"
 c.subscribe(["SLACK-KAFKA"])
 
+# TODO: Make bolts with Apache Storm
 try:
     while True:
         msg = c.poll(0.1)  # read data
