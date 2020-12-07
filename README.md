@@ -21,8 +21,8 @@
     * [Producer with callback](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/ProducerDemoCallBack.py)
     * [Producer with Slack API](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/SlackKafkaProducer.py)
     * [Consumer with Slack API](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/SlackKafkaConsumer.py)
-    * [Ajou notices Parsing Producer with Slack API](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/SlackKafkaProducer.py)
-    * [Ajou notices Parsing Consumer with Slack API](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/SlackKafkaConsumer.py)
+    * [Ajou notices Parsing Producer with Slack API](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/AjouSlackProducer.py)
+    * [Ajou notices Parsing Consumer with Slack API](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/AjouSlackConsumer.py)
     
 * Kafka (Java)
     * [Simple Producer](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemo.java)
