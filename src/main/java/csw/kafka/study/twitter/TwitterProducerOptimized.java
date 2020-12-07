@@ -24,15 +24,15 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class TwitterProducer {
-    final Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
+public class TwitterProducerOptimized {
+    final Logger logger = LoggerFactory.getLogger(TwitterProducerOptimized.class.getName());
 
-    public TwitterProducer() {
+    public TwitterProducerOptimized() {
         // pass
     }
 
     public static void main(String[] args) {
-        new TwitterProducer().run();
+        new TwitterProducerOptimized().run();
     }
 
     public void run() {
@@ -85,7 +85,17 @@ public class TwitterProducer {
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, myServer);
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        // Kafka는 데이터를 바이트로 보냄 (0,1)
+
+        // Safe Producer 설정
+        properties.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+        properties.setProperty(ProducerConfig.ACKS_CONFIG, "all");
+        properties.setProperty(ProducerConfig.RETRIES_CONFIG, Integer.toString(Integer.MAX_VALUE));
+        properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
+
+        // High throughput Producer 설정
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
+        properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
+        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32 * 1024));
 
         // Kafka Producer 만들기
         return new KafkaProducer<>(properties);
@@ -96,7 +106,7 @@ public class TwitterProducer {
         Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
         StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
 
-        List<String> terms = Lists.newArrayList("kafka", "skorea");  // tweets about
+        List<String> terms = Lists.newArrayList("kafka", "korea");  // tweets about kafka
         hosebirdEndpoint.trackTerms(terms);
 
         // These secrets should be read from a config file
