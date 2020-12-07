@@ -22,6 +22,9 @@ def acked(err, msg):
 
 # Make data into dictionary format
 def makeJson(postId, postTitle, postDate, postLink, postWriter):
+    duplicate = "[" + postWriter + "]"
+    if duplicate in postTitle:  # writer: [writer] title
+        postTitle = postTitle.replace(duplicate, "").strip()  # -> writer: title
     return {
         postId: {
             "TITLE": postTitle,

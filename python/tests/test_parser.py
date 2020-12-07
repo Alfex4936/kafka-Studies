@@ -5,9 +5,13 @@ from bs4 import BeautifulSoup
 
 
 ADDRESS = "https://www.ajou.ac.kr/kr/ajou/notice.do"
+LENGTH = 10
 
 # Make data into dictionary format
 def makeJson(postId, postTitle, postDate, postLink, postWriter):
+    duplicate = "[" + postWriter + "]"
+    if duplicate in postTitle:  # writer: [writer] title
+        postTitle = postTitle.replace(duplicate, "").strip()  # -> writer: title
     return {
         postId: {
             "TITLE": postTitle,
@@ -19,7 +23,6 @@ def makeJson(postId, postTitle, postDate, postLink, postWriter):
 
 
 def parser():
-    LENGTH = 10
     req = requests.get(f"{ADDRESS}?mode=list&&articleLimit={LENGTH}&article.offset=0")
     req.encoding = "utf-8"
     html = req.text
@@ -47,7 +50,6 @@ def test_parse():
         postTitle = posts[i].text.strip()
         postDate = dates[i].text.strip()
         postWriter = writers[i].text
-
         assert int(postId) > 10000, f"postId is None."
         assert postLink is not None, f"postLink is None."
         assert postTitle is not None, f"postTitle is None."
@@ -55,10 +57,10 @@ def test_parse():
         assert postWriter is not None, f"postWriter is None."
 
         data = makeJson(postId, postTitle, postDate, postLink, postWriter)
-        print("data", json.dumps(data[postId]))
+        temp = json.dumps(data[postId])
+        print("data", json.loads(temp))
 
 
 if __name__ == "__main__":
     test_parse()
     # print(next(iter(read["POSTS"].keys())))  # Last Key
-
