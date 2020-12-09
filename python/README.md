@@ -36,6 +36,8 @@ WIN10@DESKTOP:~$ pip install confluent-kafka
 
 ## Slack API with Ajou University notices parser
 
+[Try Ajou notice parser here](https://kafkatesthq.slack.com/archives/C01G2CR5MEE)
+
 [Get Slack API here](https://api.slack.com/)
 
 First, invite your bot to your channel. (In this example, we set it as "#아주대")
