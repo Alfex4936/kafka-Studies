@@ -17,7 +17,7 @@ def acked(err, msg):
     if err is not None:
         print("Failed to deliver message: {0}: {1}".format(msg.value(), err.str()))
     else:
-        print("Message produced: {0}".format(msg.value()))  # binary
+        print(f"Message produced: {0}...".format(msg.value()))
 
 
 # Make data into dictionary format
@@ -33,6 +33,24 @@ def makeJson(postId, postTitle, postDate, postLink, postWriter):
             "WRITER": postWriter,
         }
     }
+
+
+def checkOldness(jsonFile):
+    today = datetime.datetime.today()
+    today = datetime.datetime(today.year, today.month, today.day)
+    for post in list(jsonFile["POSTS"]):
+        currentDate = jsonFile["POSTS"][post]["DATE"]  # string
+        savedDate = datetime.datetime.strptime(currentDate, "%y.%m.%d")
+        if (today - savedDate).days > MAXIMUM_DAY:
+            del jsonFile["POSTS"][post]
+
+    with open(JSON_PATH, "w+") as f:
+        f.write(json.dumps(jsonFile))
+
+    with open(JSON_PATH, "r+") as f:
+        read = json.load(f)
+
+    return read
 
 
 # Ajou notices parser
@@ -55,6 +73,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 JSON_PATH = os.path.join(BASE_DIR, "already_read.json")
 LENGTH = 10
 PRODUCED = 0
+MAXIMUM_DAY = 7  # remove notices in json that were posted more than 7days ago
 DUMP = lambda x: json.dumps(x)
 LOAD = lambda x: json.load(x)
 
@@ -74,6 +93,8 @@ if not Path(JSON_PATH).is_file():  # 파일 없으면 기본 형식 만듬
 with open(JSON_PATH, "r+") as f_read:
     read = LOAD(f_read)
 
+read = checkOldness(read)
+
 # Set last parsed time to rest 1 hour well
 LAST_PARSED = datetime.datetime.strptime(read["LAST_PARSED"], "%Y-%m-%d %H:%M:%S.%f")
 
@@ -85,7 +106,16 @@ sc = WebClient(token)
 channel = "C01G2CR5MEE"  # 아주대
 
 # Kafka Producer 만들기  "localhost:9092"
-settings = {"bootstrap.servers": Config.MY_SERVER}
+settings = {
+    "bootstrap.servers": Config.MY_SERVER,
+    # Safe Producer settings
+    "enable.idempotence": True,
+    "acks": "all",
+    "retries": 10000000,
+    "max.in.flight": 5,
+    "compression.type": "lz4",
+    "linger.ms": 5,
+}  # "enable.idempotence": True, "retries": 5
 p = Producer(settings)
 
 try:
@@ -133,6 +163,7 @@ try:
                 print(f"Sent {PRODUCED} posts...")
             else:
                 print("No new posts yet...")
+            print("Parsed:", datetime.datetime.now())
 
         except SlackApiError as e:
             assert e.response["ok"] is False

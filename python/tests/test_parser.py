@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 ADDRESS = "https://www.ajou.ac.kr/kr/ajou/notice.do"
 LENGTH = 10
+FILTER_WORDS = ("설문", "기프트", "납부", "등록금")  # only parse if notices contain these words
 
 # Make data into dictionary format
 def makeJson(postId, postTitle, postDate, postLink, postWriter):
@@ -44,10 +45,18 @@ def test_parse():
     assert len(dates) == 10, f"Check your parser: {dates}"
     assert len(writers) == 10, f"Check your parser: {writers}"
     for i in range(LENGTH):
+        postTitle = posts[i].text.strip()
+        if FILTER_WORDS:
+            FILTERD = False
+            for filter in FILTER_WORDS:
+                if filter in postTitle:
+                    FILTERD = True
+                    break
+            if not FILTERD:
+                continue
 
         postId = ids[i].text.strip()
         postLink = posts[i].get("href")
-        postTitle = posts[i].text.strip()
         postDate = dates[i].text.strip()
         postWriter = writers[i].text
         assert int(postId) > 10000, f"postId is None."

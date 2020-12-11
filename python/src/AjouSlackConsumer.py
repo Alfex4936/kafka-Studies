@@ -31,6 +31,7 @@ try:
         msg = c.poll(0.1)
         time.sleep(5)
         if msg is None:
+            time.sleep(10)
             continue
         elif not msg.error():
             print("Received a message: {0}".format(msg.value()))

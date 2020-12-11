@@ -2,10 +2,30 @@ import json
 import os
 from contextlib import contextmanager
 from pathlib import Path
-
+from datetime import datetime, timedelta
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 JSON_PATH = os.path.join(BASE_DIR, "test.json")
+MAXIMUM_DAY = 6
+
+
+def checkOldness(jsonFile):
+    today = datetime.today()
+    today = datetime(today.year, today.month, today.day)
+    for post in list(jsonFile["POSTS"]):
+        currentDate = jsonFile["POSTS"][post]["DATE"]  # string
+        savedDate = datetime.strptime(currentDate, "%y.%m.%d")
+        if (today - savedDate).days > MAXIMUM_DAY:
+            print(f"removing {post}...")
+            del jsonFile["POSTS"][post]
+
+    with open(JSON_PATH, "w+") as f:
+        f.write(json.dumps(jsonFile))
+
+    with open(JSON_PATH, "r+") as f:
+        read = json.load(f)
+
+    return read
 
 
 @contextmanager
@@ -27,3 +47,17 @@ def test_open():
 
     assert data is not None, "data is None."
 
+
+def test_remove():
+    with open(JSON_PATH, "r+") as f_read:
+        read = json.load(f_read)
+    read = checkOldness(read)
+
+    today = datetime.today()
+    today = datetime(today.year, today.month, today.day)
+    old = today - timedelta(days=MAXIMUM_DAY)
+
+    for post in list(read["POSTS"]):
+        currentDate = read["POSTS"][post]["DATE"]  # string
+        savedDate = datetime.strptime(currentDate, "%y.%m.%d")
+        assert savedDate > old, f"{MAXIMUM_DAY}일이 지난 공지는 제거되어야 함."
