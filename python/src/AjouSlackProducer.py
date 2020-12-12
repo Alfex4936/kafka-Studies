@@ -17,7 +17,7 @@ def acked(err, msg):
     if err is not None:
         print("Failed to deliver message: {0}: {1}".format(msg.value(), err.str()))
     else:
-        print(f"Message produced: {0}...".format(msg.value()))
+        print("Message produced: {0}...".format(msg.value()))
 
 
 # Make data into dictionary format
