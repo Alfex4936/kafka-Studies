@@ -1,8 +1,6 @@
 import json
-import time
-
-
 import os
+import time
 
 from confluent_kafka import Consumer, KafkaError
 from slack import WebClient

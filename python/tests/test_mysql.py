@@ -1,10 +1,9 @@
-import mysql.connector
+import os
+from contextlib import contextmanager
 
+import mysql.connector
 import requests
 from bs4 import BeautifulSoup
-
-from contextlib import contextmanager
-import os
 
 # mysql.connector.paramstyle = "pyformat"
 

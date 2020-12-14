@@ -1,5 +1,5 @@
-from confluent_kafka import Producer
 from config import Config
+from confluent_kafka import Producer
 
 
 def acked(err, msg):

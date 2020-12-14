@@ -1,6 +1,7 @@
-from confluent_kafka import Producer
-from config import Config
 from contextlib import contextmanager
+
+from config import Config
+from confluent_kafka import Producer
 
 
 @contextmanager

@@ -1,8 +1,8 @@
 import json
 import os
 from contextlib import contextmanager
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 JSON_PATH = os.path.join(BASE_DIR, "test.json")
@@ -61,3 +61,17 @@ def test_remove():
         currentDate = read["POSTS"][post]["DATE"]  # string
         savedDate = datetime.strptime(currentDate, "%y.%m.%d")
         assert savedDate > old, f"{MAXIMUM_DAY}일이 지난 공지는 제거되어야 함."
+
+
+def test_length():
+    with open(JSON_PATH, "r+") as f_read:
+        read = json.load(f_read)
+
+    lengths = 0
+    seen = 0
+
+    for post in read["POSTS"]:
+        seen += 1
+        lengths += len(read["POSTS"][post]["TITLE"])
+
+    print(lengths / seen)
