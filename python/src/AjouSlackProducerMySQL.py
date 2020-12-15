@@ -2,8 +2,6 @@ import datetime
 import json
 import os
 import time
-from contextlib import contextmanager
-from pathlib import Path
 
 import mysql.connector
 import requests
@@ -20,23 +18,6 @@ def acked(err, msg):
         print("Failed to deliver message: {0}: {1}".format(msg.value(), err.str()))
     else:
         print("Message produced: {0}...".format(msg.value()))
-
-
-@contextmanager
-def OPEN_DB():
-    # connect to my local MySQL instance using connection string
-    db = mysql.connector.connect(
-        host="localhost",
-        user=os.environ["MYSQL_USER"],
-        password=os.environ["MYSQL_PASSWORD"],
-        database="ajou_notices",
-        charset="utf8",
-    )
-    cursor = db.cursor(buffered=True)
-    yield cursor
-    db.commit()  # always commits
-    cursor.close()
-    db.close()
 
 
 def checkOldness(db):

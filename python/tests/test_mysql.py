@@ -110,6 +110,17 @@ def test_updateDB():
             assert row is not None
 
 
+def test_printDB():
+    with OPEN_DB() as cursor:
+        cursor.execute(
+            "SELECT * FROM notices ORDER BY id"
+        )  # query = SELECT * FROM testdb.notices LIMIT 3;
+
+        for row in cursor:
+            print(row)
+            assert row is not None
+
+
 def test_lastparsed():
     """Test LAST_PARSED update"""
     from datetime import datetime
