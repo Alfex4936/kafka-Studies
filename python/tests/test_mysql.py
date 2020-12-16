@@ -139,7 +139,7 @@ def test_lastparsed():
 
 def test_delete():
     with OPEN_DB() as cursor:
-        cursor.execute("DELETE FROM notices WHERE id = 12245")
+        cursor.execute("DELETE FROM notices WHERE id = 12263")
 
 
 if __name__ == "__main__":

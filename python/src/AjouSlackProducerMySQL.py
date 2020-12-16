@@ -37,7 +37,11 @@ def makeData(postId, postTitle, postDate, postLink, postWriter):
 
 # Ajou notices parser
 def parser():
-    req = requests.get(f"{ADDRESS}?mode=list&&articleLimit=10&article.offset=0")
+    try:
+        req = requests.get(f"{ADDRESS}?mode=list&&articleLimit=10&article.offset=0")
+        req.raise_for_status()
+    except requests.exceptions.ConnectionError:
+        print("Seems like the server is down now.")
     req.encoding = "utf-8"
     html = req.text
     soup = BeautifulSoup(html, "html.parser")
@@ -95,7 +99,7 @@ channel = "C01G2CR5MEE"  # 아주대
 
 # Kafka Producer 만들기  "localhost:9092"
 settings = {
-    "bootstrap.servers": Config.MY_SERVER,
+    "bootstrap.servers": Config.VM_SERVER,
     # Safe Producer settings
     "enable.idempotence": True,
     "acks": "all",
@@ -124,12 +128,14 @@ try:
                 print(f"Wait for {3600 - diff} seconds to sync new posts.")
                 time.sleep(3600 - diff)
 
+            print("Trying to parse new posts...")
+            ids, posts, dates, writers = parser()  # 다시 파싱
+
+            # 파싱 오류가 없으면 업데이트
             cursor.execute(
                 UPDATE_COMMAND, {"date": now.strftime("%Y-%m-%d %H:%M:%S.%f")}
             )
 
-            print("Trying to parse new posts...")
-            ids, posts, dates, writers = parser()  # 다시 파싱
             for i in range(LENGTH):
                 postId = ids[i].text.strip()
 
@@ -168,7 +174,7 @@ try:
                 p.produce(
                     Config.AJOU_TOPIC_ID, value=DUMP(kafkaData[postId]), callback=acked,
                 )
-                p.poll(0.5)  # 데이터 Kafka에게 전송
+                p.poll(1)  # 데이터 Kafka에게 전송
 
             if PRODUCED:
                 print(f"Sent {PRODUCED} posts...")

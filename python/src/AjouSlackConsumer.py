@@ -16,9 +16,10 @@ sc = WebClient(token)
 # Set 'auto.offset.reset': 'smallest' if you want to consume all messages
 # from the beginning of the topic
 settings = {
-    "bootstrap.servers": Config.MY_SERVER,
+    "bootstrap.servers": Config.VM_SERVER,
     "group.id": "ajou-notify",
     "default.topic.config": {"auto.offset.reset": "largest"},
+    # "debug": "broker, cgrp",
 }
 c = Consumer(settings)
 
@@ -77,7 +78,6 @@ try:
             )
         else:
             print("Error occured: {0}".format(msg.error().str()))
-
 except Exception as e:
     print(type(e))
     print(dir(e))

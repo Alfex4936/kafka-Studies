@@ -1,5 +1,9 @@
+import os
+
+
 class Config:
     MY_SERVER = "localhost:9092"
+    VM_SERVER = os.environ["VM_SERVER"]
     TOPIC_ID = "first-topic"
     SLACK_TOPID_ID = "SLACK-KAFKA"
     AJOU_TOPIC_ID = "AJOU-NOTIFY"
