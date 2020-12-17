@@ -9,6 +9,7 @@ from slack.errors import SlackApiError
 
 
 # Bot User OAuth Access Token
+# used scopes: channels:history, channels:read, chat:write, im:history, mpim:history, users:read
 token = os.environ["SLACK_BOT_TOKEN"]
 
 sc = WebClient(token)
@@ -29,9 +30,8 @@ c.subscribe([Config.AJOU_TOPIC_ID])
 try:
     while True:
         msg = c.poll(0.1)
-        time.sleep(5)
+        time.sleep(10)
         if msg is None:
-            time.sleep(10)
             continue
         elif not msg.error():
             print("Received a message: {0}".format(msg.value()))
@@ -49,7 +49,7 @@ try:
                 href = app_msg["LINK"]
                 writer = app_msg["WRITER"]
 
-                channel = "아주대"
+                channel = "아주대"  # C01G2CR5MEE
                 # TODO: 학사면 좀 더 중요하게?
                 text = ":star: `%s` 새로운 공지!\n>%s: %s\n>링크: <%s|공지 확인하기>" % (
                     date,
@@ -86,4 +86,5 @@ except KeyboardInterrupt:
     print("Pressed CTRL+C...")
 
 finally:
+    print("Closing...")
     c.close()
