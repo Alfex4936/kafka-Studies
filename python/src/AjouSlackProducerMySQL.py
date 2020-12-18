@@ -12,11 +12,11 @@ from confluent_kafka import Producer
 
 class AjouParser:
     """
-    Ajou notices Parser using Slack API and Apache Kafka
+    Ajou notices Parser using Slack API and Apache Kafka (MySQL)
     
     Methods
     -------
-    run(server=Config.VM_SERVER, channel="C01G2CR5MEE", database="ajou_notices")
+    run(server=Config.VM_SERVER, database="ajou_notices")
     
     Usage
     -----
@@ -55,7 +55,7 @@ class AjouParser:
             "bootstrap.servers": server,
             "enable.idempotence": True,  # Safe
             "acks": "all",  # Safe
-            "retries": 10000000,  # Safe
+            "retries": 5,  # Safe
             "max.in.flight": 5,  # High throughput
             "compression.type": "lz4",  # High throughput
             "linger.ms": 5,  # High throughput
