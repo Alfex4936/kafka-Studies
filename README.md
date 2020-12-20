@@ -31,6 +31,8 @@
     * [Producer with key](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemoWithKey.java)
     * [Simple Consumer](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson2/ConsumerDemo.java)
     * [Consumer With a thread](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson2/ConsumerDemoThread.java)
+    * [Twitter tweets Producer](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/twitter/TwitterProducerOptimized.java)
+    * [Twitter tweets filtering with Kafka Streams](https://github.com/Alfex4936/kafka-Studies/blob/main/kafka-streams-filter-tweets/src/main/java/csw/kafka/streams/StreamsFilterTweets.java)
 
 * Kafka (Go)
     * [Simple Producer](https://github.com/Alfex4936/kafka-Studies/blob/main/go/src/basic_producer/BasicProducer.go)
