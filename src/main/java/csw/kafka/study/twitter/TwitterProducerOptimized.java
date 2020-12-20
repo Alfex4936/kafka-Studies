@@ -78,7 +78,7 @@ public class TwitterProducerOptimized {
     }
 
     private KafkaProducer<String, String> createKafkaProducer() {
-        String myServer = "localhost:9092";
+        String myServer = "192.168.137.232:9093";  // My Hyper-V Server
 
         // Kafka Producer 설정
         Properties properties = new Properties();
@@ -106,7 +106,7 @@ public class TwitterProducerOptimized {
         Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
         StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
 
-        List<String> terms = Lists.newArrayList("kafka", "korea");  // tweets about kafka
+        List<String> terms = Lists.newArrayList("kafka", "covid", "korea");  // tweets about kafka
         hosebirdEndpoint.trackTerms(terms);
 
         // These secrets should be read from a config file
