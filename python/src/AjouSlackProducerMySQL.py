@@ -1,10 +1,12 @@
 import datetime
 import json
 import os
+import ssl
 import time
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
 import mysql.connector
-import requests
 from bs4 import BeautifulSoup
 from config import Config
 from confluent_kafka import Producer
@@ -187,16 +189,16 @@ class AjouParser:
 
     # Ajou notices parser
     def parser(self):
+        context = ssl._create_unverified_context()
         try:
-            req = requests.get(
-                f"{self.ADDRESS}?mode=list&&articleLimit=10&article.offset=0"
+            result = urlopen(
+                f"{self.ADDRESS}?mode=list&&articleLimit={self.LENGTH}&article.offset=0",
+                context=context,
             )
-            req.raise_for_status()
-        except requests.exceptions.ConnectionError:
+        except HTTPError:
             print("Seems like the server is down now.")
             return None, None, None, None
-        req.encoding = "utf-8"
-        html = req.text
+        html = result.read()
         soup = BeautifulSoup(html, "html.parser")
         ids = soup.select("table > tbody > tr > td.b-num-box")
         posts = soup.select("table > tbody > tr > td.b-td-left > div > a")

@@ -1,6 +1,7 @@
 import json
+import ssl
 
-import requests
+from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
 
@@ -24,9 +25,13 @@ def makeJson(postId, postTitle, postDate, postLink, postWriter):
 
 
 def parser():
-    req = requests.get(f"{ADDRESS}?mode=list&&articleLimit={LENGTH}&article.offset=0")
-    req.encoding = "utf-8"
-    html = req.text
+    # req = requests.get(f"{ADDRESS}?mode=list&&articleLimit={LENGTH}&article.offset=0")
+    context = ssl._create_unverified_context()
+    result = urlopen(
+        f"{ADDRESS}?mode=list&&articleLimit={LENGTH}&article.offset=0", context=context
+    )
+
+    html = result.read()
     soup = BeautifulSoup(html, "html.parser")
     ids = soup.select("table > tbody > tr > td.b-num-box")
     posts = soup.select("table > tbody > tr > td.b-td-left > div > a")
@@ -46,14 +51,14 @@ def test_parse():
     assert len(writers) == 10, f"Check your parser: {writers}"
     for i in range(LENGTH):
         postTitle = posts[i].text.strip()
-        if FILTER_WORDS:
-            FILTERD = False
-            for filter in FILTER_WORDS:
-                if filter in postTitle:
-                    FILTERD = True
-                    break
-            if not FILTERD:
-                continue
+        # if FILTER_WORDS:
+        #     FILTERD = False
+        #     for filter in FILTER_WORDS:
+        #         if filter in postTitle:
+        #             FILTERD = True
+        #             break
+        #     if not FILTERD:
+        #         continue
 
         postId = ids[i].text.strip()
         postLink = posts[i].get("href")
