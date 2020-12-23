@@ -51,26 +51,20 @@ try:
             except:
                 app_msg = json.loads(msg.value())
 
-            try:
-                title = app_msg["TITLE"]
-                date = app_msg["DATE"]
-                href = app_msg["LINK"]
-                writer = app_msg["WRITER"]
+            title = app_msg["TITLE"]
+            date = app_msg["DATE"]
+            href = app_msg["LINK"]
+            writer = app_msg["WRITER"]
 
-                channel = "아주대"  # C01G2CR5MEE
-                # TODO: 학사면 좀 더 중요하게?
-                text = ":star: `%s` 새로운 공지!\n>%s: %s\n>링크: <%s|공지 확인하기>" % (
-                    date,
-                    writer,
-                    title,
-                    href,
-                )
-                print('\nSending message "%s" to channel %s' % (text, channel))
-            except SlackApiError as e:
-                print("Failed to get channel/text from message.")
-                print(e.response["error"])
-                channel = "kafka"
-                text = msg.value()
+            channel = "아주대"  # C01G2CR5MEE
+            # TODO: 학사면 좀 더 중요하게?
+            text = ":star: `%s` 새로운 공지!\n>%s: %s\n>링크: <%s|공지 확인하기>" % (
+                date,
+                writer,
+                title,
+                href,
+            )
+            print('\nSending message "%s" to channel %s' % (text, channel))
 
             try:
                 sc_response = sc.chat_postMessage(

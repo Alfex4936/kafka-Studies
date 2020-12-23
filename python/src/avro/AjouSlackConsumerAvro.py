@@ -62,30 +62,25 @@ try:
             rb = BytesIO(message)
 
             app_msg = schemaless_reader(rb, parsed_schema)  # read one record
-            try:
-                title = app_msg["title"]
-                date = app_msg["date"]
-                href = app_msg["link"]
-                writer = app_msg["writer"]
 
-                channel = "아주대"  # C01G2CR5MEE
-                text = ":star: `%s` 새로운 공지!\n>%s: %s\n>링크: <%s|공지 확인하기>" % (
-                    date,
-                    writer,
-                    title,
-                    href,
-                )
-                print('\nSending message "%s" to channel %s' % (text, channel))
-            except SlackApiError as e:
-                print("Failed to get channel/text from message.")
-                print(e.response["error"])
-                channel = "kafka"
-                text = msg.value()
+            title = app_msg["title"]
+            date = app_msg["date"]
+            href = app_msg["link"]
+            writer = app_msg["writer"]
+
+            channel = "아주대"  # C01G2CR5MEE
+            text = ":star: `%s` 새로운 공지!\n>%s: %s\n>링크: <%s|공지 확인하기>" % (
+                date,
+                writer,
+                title,
+                href,
+            )
+            print('\nSending message "%s" to channel %s' % (text, channel))
 
             try:
                 sc_response = sc.chat_postMessage(
                     channel=channel, text=text, as_user=True, username="아주대 공지 봇"
-                )  # as_user은 new slack app에서 작동 안 함
+                )  # as_user won't work with new slack app
 
             except SlackApiError as e:
                 assert e.response["ok"] is False
