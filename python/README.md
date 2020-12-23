@@ -125,3 +125,33 @@ _Please contact them immediately and see if we can fix the issue *right here, ri
     <img width="480" src="https://github.com/Alfex4936/kafka-Studies/blob/main/img/slack.png">
 </p>
 </div>
+
+## FastAvro Producer / Consumer
+
+Install fastavro with pip
+
+```console
+WIN10@DESKTOP:~$ pip install fastavro
+```
+
+Example Schema to use
+```python
+schema = {  # avsc
+    "namespace": "ajou.parser",
+    "name": "Notice",  # seperated but will be namespace.name
+    "doc": "A notice parser from Ajou university.",
+    "type": "record",
+    "fields": [
+        {"name": "id", "type": "int"},
+        {"name": "title", "type": "string"},
+        {"name": "date", "type": "string"},
+        {"name": "link", "type": "string"},
+        {"name": "writer", "type": "string"},
+    ],
+}
+parsed_schema = parse_schema(schema)
+```
+
+How to produce single data with Producer &
+consume it with Consumer at [pytest](https://github.com/Alfex4936/kafka-Studies/blob/main/python/tests/test_avro.py#L110)
+

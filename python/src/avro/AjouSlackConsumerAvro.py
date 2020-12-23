@@ -1,17 +1,27 @@
-import json
 import os
 import time
+from io import BytesIO
 
-from config import Config
-from confluent_kafka import Consumer, KafkaError
+from confluent_kafka import Consumer, KafkaError, KafkaException
+from fastavro import parse_schema, schemaless_reader, writer
 from slack import WebClient
 from slack.errors import SlackApiError
 
 
-def error_cb(error):
-    print(">>>", error)
-    if error == KafkaError._ALL_BROKERS_DOWN:
-        print("SERVER DOWN")
+schema = {  # avsc
+    "namespace": "ajou.parser",
+    "name": "Notice",  # seperated but will be namespace.name
+    "doc": "A notice parser from Ajou university.",
+    "type": "record",
+    "fields": [
+        {"name": "id", "type": "int"},
+        {"name": "title", "type": "string"},
+        {"name": "date", "type": "string"},
+        {"name": "link", "type": "string"},
+        {"name": "writer", "type": "string"},
+    ],
+}
+parsed_schema = parse_schema(schema)
 
 
 # Bot User OAuth Access Token
@@ -23,42 +33,42 @@ sc = WebClient(token)
 # Set 'auto.offset.reset': 'smallest' if you want to consume all messages
 # from the beginning of the topic
 settings = {
-    "bootstrap.servers": Config.VM_SERVER,
+    "bootstrap.servers": os.environ["VM_SERVER"],
     "group.id": "ajou-notify",
     "default.topic.config": {"auto.offset.reset": "largest"},
-    "error_cb": error_cb,
+    # "value.deserializer": lambda v: json.loads(v.decode("utf-8")),
     # "debug": "broker, cgrp",
 }
 c = Consumer(settings)
 
 # Topic = "AJOU-NOTIFY
-c.subscribe([Config.AJOU_TOPIC_ID])
+c.subscribe(["AJOU-NOTIFY"])
 
 try:
     while True:
-        msg = c.poll(0.1)
-        time.sleep(10)
+        # SIGINT can't be handled when polling, limit timeout to 1 second.
+        msg = c.poll(1.0)
         if msg is None:
+            time.sleep(10)
             continue
         elif not msg.error():
-            print("Received a message: {0}".format(msg.value()))
+            print("Received messages: {0}".format(len(msg)))
             if msg.value() is None:
                 print("But the message value is empty.")
                 continue
 
-            try:
-                app_msg = json.loads(msg.value().decode())
-            except:
-                app_msg = json.loads(msg.value())
+            # Consumer read message
+            message = msg.value()
+            rb = BytesIO(message)
 
+            app_msg = schemaless_reader(rb, parsed_schema)  # read one record
             try:
-                title = app_msg["TITLE"]
-                date = app_msg["DATE"]
-                href = app_msg["LINK"]
-                writer = app_msg["WRITER"]
+                title = app_msg["title"]
+                date = app_msg["date"]
+                href = app_msg["link"]
+                writer = app_msg["writer"]
 
                 channel = "아주대"  # C01G2CR5MEE
-                # TODO: 학사면 좀 더 중요하게?
                 text = ":star: `%s` 새로운 공지!\n>%s: %s\n>링크: <%s|공지 확인하기>" % (
                     date,
                     writer,
@@ -84,10 +94,12 @@ try:
             print(
                 "End of partition reached {0}/{1}".format(msg.topic(), msg.partition())
             )
+        elif msg.error():
+            raise KafkaException(msg.error())
         else:
             print("Error occured: {0}".format(msg.error().str()))
 except Exception as e:
-    print(type(e))
+    print(e)
     print(dir(e))
 
 except KeyboardInterrupt:

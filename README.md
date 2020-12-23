@@ -24,6 +24,8 @@
     * [Ajou notices Parsing Producer with Slack API](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/AjouSlackProducer.py)
     * [Ajou notices Parsing Producer with Slack API using MySQL](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/AjouSlackProducerMySQL.py)
     * [Ajou notices Parsing Consumer with Slack API](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/AjouSlackConsumer.py)
+    * [FastAvro Producer example](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/avro/AjouSlackProducerAvro.py)
+    * [FastAvro Consumer example](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/avro/AjouSlackConsumerAvro.py)
     
 * Kafka (Java)
     * [Simple Producer](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemo.java)

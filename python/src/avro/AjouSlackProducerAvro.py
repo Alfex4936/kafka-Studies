@@ -1,57 +1,63 @@
 import datetime
-import json
 import os
 import ssl
 import time
+from io import BytesIO
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
-import mysql.connector
 from bs4 import BeautifulSoup
-from config import Config
 from confluent_kafka import Producer
+from fastavro import parse_schema, reader, schemaless_writer, writer
 
 
-class AjouParser:
+schema = {  # avsc
+    "namespace": "ajou.parser",
+    "name": "Notice",  # seperated but will be namespace.name
+    "doc": "A notice parser from Ajou university.",
+    "type": "record",
+    "fields": [
+        {"name": "id", "type": "int"},
+        {"name": "title", "type": "string"},
+        {"name": "date", "type": "string"},
+        {"name": "link", "type": "string"},
+        {"name": "writer", "type": "string"},
+    ],
+}
+parsed_schema = parse_schema(schema)
+
+
+class AjouParserAVRO:
     """
-    Ajou notices Parser using Slack API and Apache Kafka (MySQL)
+    Ajou notices Parser using Slack API and Apache Kafka (AVRO)
+    
+    AVRO file will be saved in your current directory.
     
     Methods
     -------
-    run(server=Config.VM_SERVER, database="ajou_notices")
+    run(server=Config.VM_SERVER, avro_name="ajou.avro")
     
     Usage
     -----
-        ajou = AjouParser(Kafka_server_ip, mysql_db_name)
+        ajou = AjouParserAVRO(Kafka_server_ip, avro_name)
         ajou.run()
     """
 
+    # HTML
     ADDRESS = "https://www.ajou.ac.kr/kr/ajou/notice.do"
     LENGTH = 10
-    MAXIMUM_DAY = 7  # remove notices in json that were posted more than 7days ago
 
-    # MySQL commands
-    INSERT_COMMAND = (
-        "INSERT INTO notices (id, title, date, link, writer) "
-        "VALUES (%s, %s, %s, %s, %s)"
-    )
-    DUPLICATE_COMMAND = "SELECT EXISTS(SELECT * FROM notices WHERE id = %(id)s)"
-    UPDATE_COMMAND = "UPDATE notices SET date = %(date)s WHERE id = 1"
+    # AVRO
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-    __slots__ = ("db", "cursor", "settings", "producer")
+    __slots__ = ("settings", "producer", "AVRO_PATH")
 
-    def __init__(self, server=Config.VM_SERVER, database="ajou_notices"):
+    def __init__(self, server=os.environ["VM_SERVER"], avro_name="ajou.avro"):
         print("Initializing...")
 
-        # MySQL
-        self.db = mysql.connector.connect(
-            host="localhost",
-            user=os.environ["MYSQL_USER"],
-            password=os.environ["MYSQL_PASSWORD"],
-            database=database,
-            charset="utf8",
-        )
-        self.cursor = self.db.cursor(buffered=True)
+        self.AVRO_PATH = os.path.join(
+            self.BASE_DIR, avro_name
+        )  # saves into current dir
 
         self.settings = {  # Producer settings
             "bootstrap.servers": server,
@@ -59,7 +65,7 @@ class AjouParser:
             "acks": "all",  # Safe
             "retries": 5,  # Safe
             "max.in.flight": 5,  # High throughput
-            "compression.type": "lz4",  # High throughput
+            "compression.type": "snappy",  # High throughput
             "linger.ms": 5,  # High throughput
         }
         self.producer = Producer(self.settings)
@@ -67,85 +73,66 @@ class AjouParser:
     def run(self, period=3600):  # period (second)
         """Check notices from html per period and sends data to Kafka Consumer."""
         p = self.producer
-        db = self.db
-        cursor = self.cursor
+        processedIds = []  # already parsed
+
+        with open(self.AVRO_PATH, "rb") as fo:
+            for record in reader(fo):
+                processedIds.append(record["id"])  # add id to already parsed list
 
         try:
             while True:  # 1시간마다 무한 반복
+                records = []
                 print()  # Section
-                PRODUCED = 0  # How many messages did it send?
+                PRODUCED = 0  # How many messages did it send
 
-                cursor.execute("SELECT date FROM notices WHERE id = 1")
-                LAST_PARSED = datetime.datetime.strptime(
-                    cursor.fetchone()[0], "%Y-%m-%d %H:%M:%S.%f"
-                )  # db load date where id = 1
-
-                now = self.getTimeNow()
-                diff = (now - LAST_PARSED).seconds
-
-                print("Last parsed at", LAST_PARSED)
-                if (diff / period) < 1:  # 업데이트 후 period시간이 안 지났음, 대기
-                    print(f"Wait for {period - diff} seconds to sync new posts.")
-                    time.sleep(period - diff)
-
+                # No checking on last parsed date, always starts new
                 print("Trying to parse new posts...")
                 ids, posts, dates, writers = self.parser()  # 다시 파싱
                 assert ids is not None, f"Check your parser: {ids}."
 
-                # 파싱 오류가 없으면 업데이트
-                cursor.execute(
-                    self.UPDATE_COMMAND, {"date": now.strftime("%Y-%m-%d %H:%M:%S.%f")},
-                )
-
-                for i in range(self.LENGTH):
-                    postId = ids[i].text.strip()
-
-                    cursor.execute(
-                        self.DUPLICATE_COMMAND, {"id": int(postId)}
-                    )  # db duplication check
-                    if cursor.fetchone()[0]:  # (1, )
-                        continue  # postId exists
-
+                for i in range(self.LENGTH):  # check all 10 notices
+                    postId = int(ids[i].text.strip())
+                    if postId in processedIds:
+                        continue
+                    else:
+                        processedIds.append(postId)
                     postLink = self.ADDRESS + posts[i].get("href")
                     postTitle = posts[i].text.strip()
                     postDate = dates[i].text.strip()
                     postWriter = writers[i].text
 
+                    # Removing a name duplication
                     duplicate = "[" + postWriter + "]"
                     if duplicate in postTitle:  # writer: [writer] title
                         postTitle = postTitle.replace(
                             duplicate, ""
                         ).strip()  # -> writer: title
 
-                    dbData = (
-                        int(postId),
-                        postTitle,
-                        postDate,
-                        postLink,
-                        postWriter,
-                    )
-                    kafkaData = self.makeData(
+                    data = self.makeData(
                         postId, postTitle, postDate, postLink, postWriter
                     )
+                    rb = BytesIO()
+                    schemaless_writer(rb, parsed_schema, data)  # write one record
 
-                    cursor.execute(self.INSERT_COMMAND, dbData)  # db insert
+                    records.append(data)  # to write avro
 
                     print("\n>>> Sending a new post...:", postId)
                     PRODUCED += 1
                     p.produce(
-                        Config.AJOU_TOPIC_ID,
-                        value=json.dumps(kafkaData[postId]),
-                        callback=self.acked,
+                        "AJOU-NOTIFY", value=rb.getvalue(), callback=self.acked,
                     )
                     p.poll(1)  # 데이터 Kafka에게 전송, second
 
                 if PRODUCED:
                     print(f"Sent {PRODUCED} post(s)...")
+
+                    with open(self.AVRO_PATH, "wb") as out:
+                        # write avro only when there are updates
+                        writer(out, parsed_schema, records)
                 else:
                     print("\t** No new posts yet")
-                print("Parsed at", now)
+                print("Parsed at", self.getTimeNow())
 
-                db.commit()  # save data
                 print(f"Resting {period // 3600} hour...")
                 time.sleep(period)
 
@@ -156,10 +143,11 @@ class AjouParser:
             print("Pressed CTRL+C...")
         finally:
             print("\nExiting...")
-            cursor.close()
-            db.commit()
-            db.close()
             p.flush(100)
+
+    @staticmethod
+    def error_cb(error):
+        print(">>>", error)
 
     # Producer callback function
     @staticmethod
@@ -176,12 +164,11 @@ class AjouParser:
     @staticmethod
     def makeData(postId, postTitle, postDate, postLink, postWriter):
         return {
-            postId: {
-                "TITLE": postTitle,
-                "DATE": postDate,
-                "LINK": postLink,
-                "WRITER": postWriter,
-            }
+            "id": postId,
+            "title": postTitle,
+            "date": postDate,
+            "link": postLink,
+            "writer": postWriter,
         }
 
     @staticmethod
@@ -213,5 +200,5 @@ class AjouParser:
 
 
 if __name__ == "__main__":
-    ajou = AjouParser()
+    ajou = AjouParserAVRO()
     ajou.run()

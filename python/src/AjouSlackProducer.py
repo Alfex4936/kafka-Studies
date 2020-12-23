@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import ssl
 import time
 from pathlib import Path
 from urllib.error import HTTPError
