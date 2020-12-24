@@ -1,0 +1,3 @@
+[submodule "kafkaCLI"]
+	path = kafkaCLI
+	url = https://github.com/Alfex4936/Kafka-Local-CLI
