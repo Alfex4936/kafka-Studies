@@ -27,6 +27,7 @@
     * [FastAvro Producer example](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/avro/AjouSlackProducerAvro.py)
     * [FastAvro Consumer example](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/avro/AjouSlackConsumerAvro.py)
     * [Cloud Kafka Producer example](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/cloudkarafka/AjouSlackProducerCloud.py)
+    * [Cloud Kafka Consumer example](https://github.com/Alfex4936/kafka-Studies/blob/main/python/src/cloudkarafka/AjouSlackConsumerCloud.py)
     
 * Kafka (Java)
     * [Simple Producer](https://github.com/Alfex4936/kafka-Studies/blob/main/src/main/java/csw/kafka/study/lesson1/ProducerDemo.java)
