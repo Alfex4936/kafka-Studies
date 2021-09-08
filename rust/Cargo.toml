@@ -7,4 +7,5 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rdkafka = { version = "0.26.0", features = ["cmake-build"] }
+tokio = { version = "1", features = ["full"] }
+rdkafka = { version = "0.26", features = ["cmake-build", "sasl", "ssl"] }
